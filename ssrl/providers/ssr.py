@@ -55,7 +55,7 @@ class SSRProvider(BaseProvider):
         return _out
 
     @classmethod
-    def dumps(cls, conf: Dict) -> str:
+    def dumps(cls, conf):
         params = conf.pop('params', None)
         _conf = cls._clean_input(conf, cls._conf_fields, True)
 
@@ -71,7 +71,7 @@ class SSRProvider(BaseProvider):
         return cls._scheme + body        
 
     @classmethod
-    def loads(cls, link: str) -> dict:
+    def loads(cls, link):
         if not link.lower().startswith(cls._scheme):
             raise ValueError('Bad link.')
 
@@ -120,7 +120,7 @@ class SSRProvider(BaseProvider):
         return conf
 
     @staticmethod
-    def b64encode(input_: str) -> str:
+    def b64encode(input_):
         input_ = input_.encode(default_encoding)
         _encoded = base64.urlsafe_b64encode(input_) \
                          .decode(default_encoding)
@@ -128,7 +128,7 @@ class SSRProvider(BaseProvider):
         _encoded = _encoded.replace('=', '')  # Remove padding
         return _encoded
     @staticmethod
-    def b64decode(input_: str) -> str:
+    def b64decode(input_):
         input_ = input_.encode(default_encoding)
         length = len(input_)
         pad_len = length % 4
