@@ -11,7 +11,10 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements-devel.txt
+  - pip install pytest-cov
+  - pip install codecov
 
 # command to run tests
 script:
-  - pytest tests # or py.test for Python versions 3.5 and below
+  - pytest --cov=ssrl tests # or py.test for Python versions 3.5 and below
+  - codecov --token=6cf87639-7588-4cbd-a265-4c23435b84fe
