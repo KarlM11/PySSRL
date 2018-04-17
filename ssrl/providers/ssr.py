@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
+from __future__ import unicode_literals
+
 import base64
 import six
-from typing import Dict
 from urllib.parse import urlencode, parse_qsl
 from ssrl.functional import default_encoding
 from .base import BaseProvider
