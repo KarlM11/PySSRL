@@ -3,7 +3,12 @@ from __future__ import unicode_literals
 
 import base64
 import six
-from urllib.parse import urlencode, parse_qsl
+
+if six.PY2:
+    from urllib import urlencode, parse_qsl
+else:
+    from urllib.parse import urlencode, parse_qsl
+
 from ssrl.functional import default_encoding
 from .base import BaseProvider
 

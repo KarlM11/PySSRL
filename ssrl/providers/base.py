@@ -1,13 +1,12 @@
 # -*- coding:utf-8 -*-
-from typing import Dict
 
 
 class BaseProvider(object):
 
     @staticmethod
-    def loads(link_url: str) -> dict:
+    def loads(link_url):
         raise NotImplementedError("Implemetion required.")
 
     @staticmethod
-    def dumps(conf: Dict) -> str:
+    def dumps(conf):
         raise NotImplementedError("Implemetion required.")
