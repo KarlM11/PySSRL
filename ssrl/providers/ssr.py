@@ -2,7 +2,7 @@
 import base64
 import six
 from typing import Dict
-from urllib.parse import parse_qsl
+from urllib.parse import urlencode, parse_qsl
 from ssrl.functional import default_encoding
 from .base import BaseProvider
 
@@ -10,7 +10,19 @@ from .base import BaseProvider
 class SSRProvider(BaseProvider):
 
     _scheme = 'ssr://'
-    _template = '{}'
+    _template = '{server}:{server_port}:{protocol}:{method}:{obfs}:{password}/'
+
+    # Defines config fields.
+    # All of them are required.
+    # fields -> name, is_encode, type
+    _conf_fields = (
+        ('server', False, str),
+        ('server_port', False, str),
+        ('method', False, str),
+        ('password', True, str),
+        ('protocol', False, str),
+        ('obfs', False, str)
+    )
 
     # Defines param fields.
     # Neither of them is required.
@@ -23,10 +35,40 @@ class SSRProvider(BaseProvider):
         ('udpport', False, int),
         ('uot', False, int)
     )
-    
-    @staticmethod
-    def dumps(conf: Dict) -> str:
-        pass
+
+    @classmethod
+    def _clean_input(cls, data, fields, strict=True):
+        _out = dict()
+        for k, e, t in fields:
+            _v = data.get(k, '')
+            if not _v:
+                if strict:
+                    raise KeyError('Key %s missing.' % k)
+                else:
+                    continue
+
+            if e:
+                _v = cls.b64encode(_v)
+
+            _out[k] = t(_v)
+        
+        return _out
+
+    @classmethod
+    def dumps(cls, conf: Dict) -> str:
+        params = conf.pop('params', None)
+        _conf = cls._clean_input(conf, cls._conf_fields, True)
+
+        body = cls._template.format(**_conf)
+
+        if params:
+            _params = cls._clean_input(params, cls._param_fields, False)
+            _qs = urlencode(_params)
+            if _qs:
+                body = '?'.join((body, _qs))
+
+        body = cls.b64encode(body)
+        return cls._scheme + body        
 
     @classmethod
     def loads(cls, link: str) -> dict:
@@ -35,7 +77,15 @@ class SSRProvider(BaseProvider):
 
         body = link[len(cls._scheme):]
         body = cls.b64decode(body)
-        base, extra = body.split('/?')  # Split body and params.
+
+        try:
+            base, extra = body.split('/?')  # Split body and params.
+        except IndexError:
+            extra = None
+            base = body
+
+            if body.endswith('/'):
+                base = base[:-1]
 
         host, port, proto, method, obfs, pass_en = base.split(':')
         params = dict(parse_qsl(extra))  # Cast parsed params to dict.
@@ -49,6 +99,10 @@ class SSRProvider(BaseProvider):
             'protocol': proto,
             'obfs': obfs
         }
+
+        if not extra:
+            conf['params'] = None
+            return conf
 
         parsed_params = dict()
         for k, e, t in cls._param_fields:
@@ -71,7 +125,7 @@ class SSRProvider(BaseProvider):
         _encoded = base64.urlsafe_b64encode(input_) \
                          .decode(default_encoding)
 
-        _encoded = _encoded.replace('==', '')  # Remove padding
+        _encoded = _encoded.replace('=', '')  # Remove padding
         return _encoded
     @staticmethod
     def b64decode(input_: str) -> str:

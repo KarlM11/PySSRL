@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import copy
 from unittest import TestCase
 from ssrl.functional import default_encoding
 from ssrl.providers.ssr import SSRProvider
@@ -58,3 +59,24 @@ class TestSSRProvider(TestCase):
         for k, v in params_expected.items():
             _v = params[k]
             self.assertEqual(v, _v, '[Param] %s' % k)
+
+    def test_ssr_dump(self):
+        conf = {
+            'server': '127.0.0.1',
+            'server_port': '1234',
+            'password': 'aaabbb',
+            'method': 'aes-128-cfb',
+            'protocol': 'auth_aes128_md5',
+            'obfs': 'tls1.2_ticket_auth'
+        }
+
+        params = {
+            "obfsparam": "breakwa11.moe"
+        }
+
+        _conf = copy.copy(conf)
+        _conf['params'] = copy.copy(params)
+
+        _link = SSRProvider.dumps(_conf)
+        _link_expected = 'ssr://MTI3LjAuMC4xOjEyMzQ6YXV0aF9hZXMxMjhfbWQ1OmFlcy0xMjgtY2ZiOnRsczEuMl90aWNrZXRfYXV0aDpZV0ZoWW1KaS8_b2Jmc3BhcmFtPVluSmxZV3QzWVRFeExtMXZaUQ'
+        self.assertEqual(_link_expected, _link, 'Generated link does not match.')
