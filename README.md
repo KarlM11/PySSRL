@@ -1,7 +1,8 @@
 # PySSRL - <u>P</u>ython <u>S</u>hadow<u>s</u>ocks <u>R</u>esource <u>L</u>ibrary
 Library for prasing / generating Shadowsocks & ShadowsocksR links.
 
-**CAUTION: Supports Python 3 ONLY!!!**
+[![Build Status](https://travis-ci.org/AspirinGeyer/PySSRL.svg?branch=master)](https://travis-ci.org/AspirinGeyer/PySSRL)
+[![codecov](https://codecov.io/gh/AspirinGeyer/PySSRL/branch/master/graph/badge.svg)](https://codecov.io/gh/AspirinGeyer/PySSRL)
 
 ## Usage
 ```python
