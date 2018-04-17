@@ -17,7 +17,7 @@ class SSRProvider(BaseProvider):
     # fields -> name, is_encode, type
     _param_fields = (
         ('group', True, str),
-        ('obfs_param', True, str),
+        ('obfsparam', True, str),
         ('protoparam', True, str),
         ('remarks', True, str),
         ('udpport', False, int),

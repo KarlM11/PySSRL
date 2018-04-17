@@ -40,6 +40,11 @@ class TestSSRProvider(TestCase):
             'obfs': 'tls1.2_ticket_auth'
         }
 
+        params_expected = {
+            "obfsparam": "breakwa11.moe",
+            "remarks": "测试中文"
+        }
+
         res = SSRProvider.loads(_in)
         res_remark = SSRProvider.loads(_in_remark)
 
@@ -48,3 +53,8 @@ class TestSSRProvider(TestCase):
             _vr = res_remark[k]
             self.assertEqual(v, _v, k)
             self.assertEqual(v, _vr, '[Remark] %s' % k)
+
+        params = res_remark['params']
+        for k, v in params_expected.items():
+            _v = params[k]
+            self.assertEqual(v, _v, '[Param] %s' % k)
