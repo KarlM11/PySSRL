@@ -3,11 +3,13 @@ from __future__ import unicode_literals
 
 import base64
 import six
-from ssrl.functional import default_encoding, urlencode, parse_qsl
+from ssrl.functional import (default_encoding, urlencode, parse_qsl,
+                             b64decode, b64encode)
 from .base import BaseProvider
 
 
 class SSRProvider(BaseProvider):
+
 
     _scheme = 'ssr://'
     _template = '{server}:{server_port}:{protocol}:{method}:{obfs}:{password}/'
@@ -48,7 +50,7 @@ class SSRProvider(BaseProvider):
                     continue
 
             if e:
-                _v = cls.b64encode(_v)
+                _v = b64encode(_v)
 
             _out[k] = t(_v)
         
@@ -67,7 +69,7 @@ class SSRProvider(BaseProvider):
             if _qs:
                 body = '?'.join((body, _qs))
 
-        body = cls.b64encode(body)
+        body = b64encode(body)
         return cls._scheme + body        
 
     @classmethod
@@ -76,7 +78,7 @@ class SSRProvider(BaseProvider):
             raise ValueError('Bad link.')
 
         body = link[len(cls._scheme):]
-        body = cls.b64decode(body)
+        body = b64decode(body)
 
         try:
             base, extra = body.split('/?')  # Split body and params.
@@ -90,7 +92,7 @@ class SSRProvider(BaseProvider):
         # Use `rsplit in order to handle IPv6 address.`
         host, port, proto, method, obfs, pass_en = base.rsplit(':', 5)
         params = dict(parse_qsl(extra))  # Cast parsed params to dict.
-        passwd = cls.b64decode(pass_en)
+        passwd = b64decode(pass_en)
 
         conf = {
             'server': host,
@@ -113,28 +115,28 @@ class SSRProvider(BaseProvider):
                 continue
 
             if e:
-                v = cls.b64decode(v)
+                v = b64decode(v)
 
             parsed_params[k] = t(v)
             
         conf['params'] = parsed_params
         return conf
 
-    @staticmethod
-    def b64encode(input_):
-        input_ = input_.encode(default_encoding)
-        _encoded = base64.urlsafe_b64encode(input_) \
-                         .decode(default_encoding)
+    # @staticmethod
+    # def b64encode(input_):
+    #     input_ = input_.encode(default_encoding)
+    #     _encoded = base64.urlsafe_b64encode(input_) \
+    #                      .decode(default_encoding)
 
-        _encoded = _encoded.replace('=', '')  # Remove padding
-        return _encoded
-    @staticmethod
-    def b64decode(input_):
-        input_ = input_.encode(default_encoding)
-        length = len(input_)
-        pad_len = length % 4
+    #     _encoded = _encoded.replace('=', '')  # Remove padding
+    #     return _encoded
+    # @staticmethod
+    # def b64decode(input_):
+    #     input_ = input_.encode(default_encoding)
+    #     length = len(input_)
+    #     pad_len = length % 4
 
-        # Base64 library accepts extra paddings.
-        pad = b'=' * pad_len
-        input_ += pad
-        return base64.urlsafe_b64decode(input_).decode(default_encoding)
+    #     # Base64 library accepts extra paddings.
+    #     pad = b'=' * pad_len
+    #     input_ += pad
+    #     return base64.urlsafe_b64decode(input_).decode(default_encoding)
