@@ -87,7 +87,8 @@ class SSRProvider(BaseProvider):
             if body.endswith('/'):
                 base = base[:-1]
 
-        host, port, proto, method, obfs, pass_en = base.split(':')
+        # Use `rsplit in order to handle IPv6 address.`
+        host, port, proto, method, obfs, pass_en = base.rsplit(':', 5)
         params = dict(parse_qsl(extra))  # Cast parsed params to dict.
         passwd = cls.b64decode(pass_en)
 

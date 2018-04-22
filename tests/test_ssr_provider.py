@@ -82,3 +82,29 @@ class TestSSRProvider(TestCase):
         _link = SSRProvider.dumps(_conf)
         _link_expected = 'ssr://MTI3LjAuMC4xOjEyMzQ6YXV0aF9hZXMxMjhfbWQ1OmFlcy0xMjgtY2ZiOnRsczEuMl90aWNrZXRfYXV0aDpZV0ZoWW1KaS8_b2Jmc3BhcmFtPVluSmxZV3QzWVRFeExtMXZaUQ'
         self.assertEqual(_link_expected, _link, 'Generated link does not match.')
+
+    def test_ssr_parse_v6(self):
+        _link = 'ssr://MjAwMTowZGI4OjAwMDA6MDA0MjowMDAwOjhhMmU6MDM3MDo3MzM0OjEwMDE6YXV0aF9jaGFpbl9iOmFlcy0yNTYtY2ZiOnBsYWluOlVXRmFkMU40Lz9vYmZzcGFyYW09JnJlbWFya3M9U1ZCMk5pQlVaWE4wJmdyb3VwPVFuSmhkbThoSVE'
+
+        _expected = {
+            'server': '2001:0db8:0000:0042:0000:8a2e:0370:7334',
+            'server_port': '1001',
+            'password': 'QaZwSx',
+            'method': 'aes-256-cfb',
+            'protocol': 'auth_chain_b',
+            'obfs': 'plain'
+        }
+
+        _expected_params  = {
+                'remarks': 'IPv6 Test',
+                'group': 'Bravo!!'
+        }
+
+        _parsed = SSRProvider.loads(_link)
+        _parsed_params = _parsed.pop('params')
+
+        for k, v in _expected.items():
+            self.assertEqual(v, _parsed[k])
+
+        for k, v in _expected_params.items():
+            self.assertEqual(v, _expected_params[k])
