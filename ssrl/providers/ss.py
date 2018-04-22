@@ -1,8 +1,10 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
+import six
 from .base import BaseProvider
-from ssrl.functional import b64encode, b64decode, quote, unquote, parse_qsl
+from ssrl.functional import (b64encode, b64decode, quote, unquote, parse_qsl,
+                             default_encoding)
 
 
 class SSProvider(BaseProvider):
@@ -21,7 +23,11 @@ class SSProvider(BaseProvider):
         body = link[len(cls._scheme):]
         if '#' in body:
             body, remarks = body.split('#')
-            remarks = unquote(remarks)
+            if six.PY2:
+                remarks = remarks.encode(default_encoding)
+                remarks = unquote(remarks).decode(default_encoding)
+            else:
+                remarks = unquote(remarks)
         else:
             remarks = None
 
@@ -59,7 +65,7 @@ class SSProvider(BaseProvider):
             uri = cls._dump_original(**conf)
 
         if remarks:
-            _remarks = '#' + quote(remarks).lower()
+            _remarks = '#' + quote(remarks.encode(default_encoding)).lower()
         else:
             _remarks = ''
 
